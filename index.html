@@ -1,35 +1,99 @@
 <!doctype html>
 <html lang="ko">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>연금 계산기 | 노후자금 계산</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>국민연금·공무원연금 비교 계산기</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<header class="top">
+  <div class="brand"><span class="logo">₩</span><div><h1>연금 계산기</h1><p>국민연금과 공무원연금을 한눈에 비교해보세요.</p></div></div>
+  <div class="notice">ⓘ 예상액을 간편하게 계산하는 참고용 도구입니다.</div>
+</header>
+
 <main class="wrap">
-<div class="badge">PENSION</div>
-<h1>연금 계산기</h1>
-<p class="desc">현재 연금자산과 월 납입액, 기간, 예상수익률을 입력해 예상 연금자산과 월 수령액을 확인하세요.</p>
-<div class="notice">※ 금액은 모두 <b>만원 단위</b>입니다. 예: 50,000만원 = 5억원</div>
-<section class="card">
-<label>현재 보유 연금자산 (만원)</label><input class="money" id="initial" inputmode="numeric" value="0">
-<label>매월 납입액 (만원)</label><input class="money" id="monthly" inputmode="numeric" value="50">
-<label>납입기간 (년)</label><input id="years" type="number" value="20" min="1" max="60">
-<label>예상 연 수익률 (%)</label><input id="rate" type="number" value="4" min="0" max="30" step="0.1">
-<label>은퇴 후 연금 수령기간 (년)</label><input id="receiveYears" type="number" value="25" min="1" max="60">
-<button id="calc">계산하기</button>
-</section>
-<section class="result">
-<div class="result-title">예상 결과</div>
-<div class="big" id="asset">0만원</div>
-<div class="sub">납입 종료 시 예상 연금자산</div>
-<div class="rows">
-<div><span>총 납입원금</span><b id="principal">0만원</b></div>
-<div><span>예상 운용수익</span><b id="gain">0만원</b></div>
-<div><span>예상 월 연금액</span><b id="pension">0만원</b></div>
-</div>
-<p class="small">※ 단순 추정용 계산기입니다. 실제 국민연금·공무원연금·퇴직연금 등의 수령액은 가입기간, 기준소득월액, 제도별 산식 등에 따라 달라집니다.</p>
-</section>
+  <section class="hero">
+    <div>
+      <span class="eyebrow">PENSION PLANNER</span>
+      <h2>승진 시나리오까지 반영한<br><b>나의 예상 연금</b></h2>
+      <p>9급 유지 · 8급 승진 · 7급 승진을 비교하고 국민연금과 함께 확인할 수 있습니다.</p>
+    </div>
+    <div class="hero-card"><span>현재 선택</span><strong id="heroScenario">7급 승진</strong><small>공무원연금 시나리오</small></div>
+  </section>
+
+  <div class="grid">
+    <section class="panel inputs">
+      <div class="tabs">
+        <button class="tab active" data-tab="civil">🏛 공무원연금</button>
+        <button class="tab" data-tab="national">👥 국민연금</button>
+      </div>
+
+      <div id="civilTab" class="tab-content">
+        <div class="section-title green">공무원연금 입력항목</div>
+        <div class="two-col">
+          <label>임용일<input id="appoint" type="date" value="2022-12-12"></label>
+          <label>퇴직예정일<input id="retire" type="date" value="2052-06-30"></label>
+        </div>
+        <div class="two-col">
+          <label>군 복무기간 시작<input id="milStart" type="month" value="2011-07"></label>
+          <label>군 복무기간 종료<input id="milEnd" type="month" value="2013-04"></label>
+        </div>
+        <div class="two-col">
+          <label>현재 직급<select id="rank"><option>9급</option><option>8급</option><option>7급</option></select></label>
+          <label>현재 호봉<input id="step" type="number" min="1" max="40" value="6"></label>
+        </div>
+        <label>승진 시나리오</label>
+        <div class="scenario">
+          <label><input type="radio" name="scenario" value="9" > <span>9급 유지</span></label>
+          <label><input type="radio" name="scenario" value="8"> <span>8급 승진</span></label>
+          <label class="selected"><input type="radio" name="scenario" value="7" checked> <span>7급 승진</span></label>
+        </div>
+        <div class="two-col">
+          <label>7급 승진 예상시점<input id="promo7" type="number" min="0" max="30" value="8"><small>임용 후 경과년수</small></label>
+          <label>8급 승진 예상시점<input id="promo8" type="number" min="0" max="20" value="4"><small>임용 후 경과년수</small></label>
+        </div>
+        <label>기준 월소득(만원)<input id="civilIncome" class="money" value="380"></label>
+        <div class="hint">※ 실제 공무원연금은 재직기간·기준소득월액·승진·호봉 등에 따라 달라집니다. 이 계산기는 비교용 간편 추정입니다.</div>
+      </div>
+
+      <div id="nationalTab" class="tab-content hidden">
+        <div class="section-title blue">국민연금 입력항목</div>
+        <div class="two-col">
+          <label>현재 나이<input id="nAge" type="number" value="33"></label>
+          <label>예상 수령 시작 나이<input id="nStart" type="number" value="65"></label>
+        </div>
+        <div class="two-col">
+          <label>국민연금 가입기간(년)<input id="nYears" type="number" value="20"></label>
+          <label>평균 기준소득월액(만원)<input id="nIncome" class="money" value="320"></label>
+        </div>
+        <label>예상 수령기간(년)<input id="nReceive" type="number" value="25"></label>
+        <div class="hint">※ 국민연금 실제 예상연금액은 국민연금공단의 개인별 조회 결과와 다를 수 있습니다.</div>
+      </div>
+
+      <button class="calc" id="calculate">계산하기 <span>→</span></button>
+    </section>
+
+    <section class="panel results">
+      <div class="result-head"><div><span class="eyebrow">RESULT</span><h3>예상 연금 월 수령액</h3></div><span class="badge" id="badge">7급 승진</span></div>
+      <div class="cards">
+        <div class="result-card blue-card"><span>국민연금</span><strong id="nMonthly">0원</strong><small id="nMonthlyWon">(0만원)</small><em>연 <b id="nYearly">0만원</b></em></div>
+        <div class="result-card green-card"><span>공무원연금</span><strong id="cMonthly">0원</strong><small id="cMonthlyWon">(0만원)</small><em>연 <b id="cYearly">0만원</b></em></div>
+        <div class="result-card orange-card"><span>월 차이</span><strong id="diff">0원</strong><small id="diffWon">(0만원)</small><em id="diffText">공무원연금이 더 많습니다.</em></div>
+      </div>
+      <div class="visuals">
+        <div class="chartbox"><h4>월 연금 수령액 비교</h4><div class="bars"><div><span id="nBar"></span><b id="nBarText">0만원</b><small>국민연금</small></div><div><span id="cBar"></span><b id="cBarText">0만원</b><small>공무원연금</small></div></div></div>
+        <div class="summary"><h4>핵심 요약</h4><ul id="summary"></ul></div>
+      </div>
+    </section>
+  </div>
+
+  <section class="panel scenario-panel">
+    <div class="result-head"><div><span class="eyebrow">PROMOTION SCENARIO</span><h3>승진 시나리오별 공무원연금 예상액</h3></div></div>
+    <div class="table-wrap"><table><thead><tr><th>구분</th><th>예상 월 수령액</th><th>연 수령액</th><th>25년 총 수령액</th><th>9급 유지 대비</th></tr></thead><tbody id="scenarioRows"></tbody></table></div>
+    <p class="footnote">※ 승진 시나리오는 간편 추정 모델입니다. 실제 연금은 개인의 기준소득월액 이력, 재직기간, 승진·호봉, 연금제도 변경 등에 따라 달라질 수 있습니다.</p>
+  </section>
 </main>
 <script src="script.js"></script>
-</body></html>
+</body>
+</html>

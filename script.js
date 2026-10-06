@@ -1,18 +1,15 @@
 const $=id=>document.getElementById(id);
-function money(id){return (Number($(id).value.replace(/,/g,''))||0)*10000}
-function fmt(n){return Math.round(n/10000).toLocaleString('ko-KR')+'만원'}
-function fmtInput(e){let v=e.value.replace(/[^0-9]/g,'');e.value=v?Number(v).toLocaleString('ko-KR'):''}
-document.querySelectorAll('.money').forEach(e=>{e.addEventListener('input',()=>fmtInput(e));fmtInput(e)});
-function calc(){
- const initial=money('initial'), monthly=money('monthly');
- const years=Math.max(1,Number($('years').value)||1);
- const r=Math.max(0,Number($('rate').value)||0)/100;
- const receive=Math.max(1,Number($('receiveYears').value)||1);
- const months=years*12, mr=Math.pow(1+r,1/12)-1;
- const fvInitial=initial*Math.pow(1+mr,months);
- const fvMonthly=mr===0?monthly*months:monthly*((Math.pow(1+mr,months)-1)/mr);
- const asset=fvInitial+fvMonthly, principal=initial+monthly*months;
- $('asset').textContent=fmt(asset);$('principal').textContent=fmt(principal);
- $('gain').textContent=fmt(Math.max(0,asset-principal));$('pension').textContent=fmt(asset/(receive*12));
-}
-$('calc').onclick=calc;calc();
+function won(man){return Math.round(man*10000)}
+function fmtWon(w){return new Intl.NumberFormat("ko-KR").format(Math.round(w))+"원"}
+function fmtMan(m){return new Intl.NumberFormat("ko-KR").format(Math.round(m))+"만원"}
+function yearsBetween(a,b){return Math.max(0,(new Date(b)-new Date(a))/(365.2425*86400000))}
+function civilBase(){const years=yearsBetween($("appoint").value,$("retire").value);const military=Math.max(0,(new Date($("milEnd").value+"-01")-new Date($("milStart").value+"-01"))/(365.2425*86400000));const income=Number($("civilIncome").value)||0;return {years:years+military,income}}
+function estimateCivil(rank){const d=civilBase();const rankFactor={9:.94,8:1.05,7:1.18}[rank];const serviceFactor=Math.min(1.08,0.72+d.years*.009);return d.income*rankFactor*serviceFactor*0.62}
+function estimateNational(){const income=Number($("nIncome").value)||0;const years=Number($("nYears").value)||0;return Math.max(0,income*(0.0129*years)+income*.04)}
+function calc(){const selected=document.querySelector('input[name=scenario]:checked').value;const c=estimateCivil(selected);const n=estimateNational();const diff=c-n;$("cMonthly").textContent=fmtWon(won(c));$("cMonthlyWon").textContent="("+fmtMan(c)+")";$("cYearly").textContent=fmtMan(c*12);$("nMonthly").textContent=fmtWon(won(n));$("nMonthlyWon").textContent="("+fmtMan(n)+")";$("nYearly").textContent=fmtMan(n*12);$("diff").textContent=fmtWon(won(Math.abs(diff)));$("diffWon").textContent="("+fmtMan(Math.abs(diff))+")";$("diffText").textContent=diff>=0?"공무원연금이 더 많습니다.":"국민연금이 더 많습니다.";const max=Math.max(c,n,1);$("nBar").style.height=Math.max(8,n/max*150)+"px";$("cBar").style.height=Math.max(8,c/max*150)+"px";$("nBarText").textContent=fmtMan(n);$("cBarText").textContent=fmtMan(c);$("badge").textContent=selected==="9"?"9급 유지":selected==="8"?"8급 승진":"7급 승진";$("heroScenario").textContent=$("badge").textContent;const diff25=Math.abs(diff)*12*25;$("summary").innerHTML=`<li>📌 국민연금은 월 <b>${fmtMan(n)}</b>, 공무원연금은 월 <b>${fmtMan(c)}</b>로 추정됩니다.</li><li>📌 월 차이는 <b>${fmtMan(Math.abs(diff))}</b>입니다.</li><li>📌 25년 동안 단순 합산하면 차이는 약 <b>${fmtMan(diff25)}</b>입니다.</li><li>⚠️ 실제 연금액은 제도·소득이력·재직기간 등에 따라 달라집니다.</li>`;rows()}
+function rows(){const n=estimateNational();const data=[["9","9급 유지",estimateCivil("9")],["8","8급 승진",estimateCivil("8")],["7","7급 승진",estimateCivil("7")]];const base=data[0][2];$("scenarioRows").innerHTML=data.map(x=>`<tr class="${document.querySelector('input[name=scenario]:checked').value===x[0]?"selected":""}"><td>${x[1]}</td><td>${fmtWon(won(x[2]))}<br><small>(${fmtMan(x[2])})</small></td><td>${fmtMan(x[2]*12)}</td><td>${fmtMan(x[2]*12*25)}</td><td>${x[0]==="9"?"-":"+"+fmtWon(won(x[2]-base))+" ("+((x[2]/base-1)*100).toFixed(1)+"%)"}</td></tr>`).join("")}
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));t.classList.add("active");$("civilTab").classList.toggle("hidden",t.dataset.tab!=="civil");$("nationalTab").classList.toggle("hidden",t.dataset.tab!=="national")});
+document.querySelectorAll('input[name=scenario]').forEach(r=>r.onchange=calc);
+$("calculate").onclick=calc;
+document.querySelectorAll(".money").forEach(i=>i.addEventListener("input",()=>{i.value=i.value.replace(/[^0-9]/g,"")}));
+calc();
