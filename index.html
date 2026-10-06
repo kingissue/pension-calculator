@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>연금 계산기 | 노후자금 계산</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="wrap">
+<div class="badge">PENSION</div>
+<h1>연금 계산기</h1>
+<p class="desc">현재 연금자산과 월 납입액, 기간, 예상수익률을 입력해 예상 연금자산과 월 수령액을 확인하세요.</p>
+<div class="notice">※ 금액은 모두 <b>만원 단위</b>입니다. 예: 50,000만원 = 5억원</div>
+<section class="card">
+<label>현재 보유 연금자산 (만원)</label><input class="money" id="initial" inputmode="numeric" value="0">
+<label>매월 납입액 (만원)</label><input class="money" id="monthly" inputmode="numeric" value="50">
+<label>납입기간 (년)</label><input id="years" type="number" value="20" min="1" max="60">
+<label>예상 연 수익률 (%)</label><input id="rate" type="number" value="4" min="0" max="30" step="0.1">
+<label>은퇴 후 연금 수령기간 (년)</label><input id="receiveYears" type="number" value="25" min="1" max="60">
+<button id="calc">계산하기</button>
+</section>
+<section class="result">
+<div class="result-title">예상 결과</div>
+<div class="big" id="asset">0만원</div>
+<div class="sub">납입 종료 시 예상 연금자산</div>
+<div class="rows">
+<div><span>총 납입원금</span><b id="principal">0만원</b></div>
+<div><span>예상 운용수익</span><b id="gain">0만원</b></div>
+<div><span>예상 월 연금액</span><b id="pension">0만원</b></div>
+</div>
+<p class="small">※ 단순 추정용 계산기입니다. 실제 국민연금·공무원연금·퇴직연금 등의 수령액은 가입기간, 기준소득월액, 제도별 산식 등에 따라 달라집니다.</p>
+</section>
+</main>
+<script src="script.js"></script>
+</body></html>
